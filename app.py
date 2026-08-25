@@ -310,7 +310,7 @@ class SurrogateHistory:
 # ode_models/Phy_heart_ode.py -- HeartODE (unmodified logic)
 # =============================================================================
 
-"""
+_ = """
 Phy_heart_ode.py
 ================
 Physics-based ODE module for the heart and systemic arteries, built on the
@@ -580,7 +580,7 @@ class HeartODE:
 # ode_models/Phy_kidney_ode.py -- KidneyODE (unmodified logic)
 # =============================================================================
 
-"""
+_ = """
 Phy_kidney_ode.py
 =================
 Physics-based ODE module for the kidney, built on a simplified Guyton-style
@@ -920,7 +920,7 @@ class KidneyODE:
 # ode_models/Phy_liver_ode.py -- LiverODE (unmodified logic)
 # =============================================================================
 
-"""
+_ = """
 Phy_liver_ode.py
 ================
 Physics-based ODE module for the liver: a hepatic metabolic model of glycogen
@@ -1226,7 +1226,7 @@ class LiverODE:
 # ode_models/Phy_lungs_ode.py -- LungsODE + atmosphere helpers (unmodified logic)
 # =============================================================================
 
-"""
+_ = """
 Phy_lungs_ode.py
 ================
 Physics-based ODE module for the lungs: pulmonary gas exchange with altitude
@@ -1745,7 +1745,7 @@ class LungsODE:
 # ode_models/Phy_pancreases_ode.py -- PancreasODE (unmodified logic)
 # =============================================================================
 
-"""
+_ = """
 Phy_pancreases_ode.py
 =====================
 Physics-based ODE module for the pancreas, built on the Bergman minimal model
@@ -1918,7 +1918,7 @@ class PancreasODE:
 # integration/human_body.py -- PARAMETERS, COUPLING_MAP, FEEDBACK_LOOPS, HumanBody, compare_parameter, etc. (unmodified logic; imports/sys.path stripped, trailing __main__ demo block stripped -- see module docstring above)
 # =============================================================================
 
-"""
+_ = """
 human_body.py
 =============
 The coupled whole-body model (M6). This is the file that turns five isolated
@@ -2910,7 +2910,7 @@ def describe_couplings():
 # scenarios/disease_scenarios.py -- SCENARIOS, run_scenario, evaluate_effects, evaluate_scenario, evaluate_all_scenarios (unmodified logic; imports/sys.path stripped, trailing __main__ block stripped, organ_impact_summary renamed to disease_organ_impact_summary, its own ORGAN_SIGNATURE_COLUMNS/_NO_EFFECT_THRESHOLD dropped as duplicates of drug_interventions.py's identical copies below -- see module docstring above)
 # =============================================================================
 
-"""
+_ = """
 disease_scenarios.py
 =====================
 Disease-progression scenarios for the coupled whole-body model, filling
@@ -3523,7 +3523,7 @@ def disease_organ_impact_summary(name, baseline_df, scenario_df):
 # interventions/drug_interventions.py -- DRUGS, ORGAN_DRUGS, ORGAN_LABELS, ORGAN_SIGNATURE_COLUMNS (canonical single definition), HumanBodyWithInterventions, run_intervention, evaluate_intervention, run_multi_intervention, organ_impact_summary_multidrug, organ_impact_summary (unmodified logic; imports/sys.path stripped, trailing __main__ block stripped)
 # =============================================================================
 
-"""
+_ = """
 drug_interventions.py
 ======================
 Drug / intervention modelling for the coupled whole-body model, filling the
@@ -4953,7 +4953,7 @@ def organ_impact_summary(drug, baseline_df, treated_df, evaluation_df, eval_time
 # streamlit_app/organ_runner.py -- single-organ runners (unmodified logic; imports/sys.path stripped)
 # =============================================================================
 
-"""
+_ = """
 organ_runner.py
 ================
 Runs ONE organ, alone, from a `organ_models/<organ>_artifact.pkl` produced by
@@ -5235,7 +5235,7 @@ RUNNERS = {
 # streamlit_app/app.py -- the Streamlit UI (imports/sys.path stripped; artifact-pkl paths fixed to flat; ORGAN_SIGNATURE_COLUMNS -> ORGAN_SIGNATURE_COLUMNS; organ_runner.<fn> -> <fn>)
 # =============================================================================
 
-"""
+_ = """
 app.py
 ======
 Streamlit front end for the whole-body digital twin.
