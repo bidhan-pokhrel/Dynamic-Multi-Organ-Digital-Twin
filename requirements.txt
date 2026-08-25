@@ -1,25 +1,13 @@
 streamlit>=1.30
+numpy>=1.26
+pandas>=2.1
+scipy>=1.12
+matplotlib>=3.8
 
-# --- Python < 3.13: exact versions this project trained its BiLSTM
-# surrogates and verified its physics ODEs against. Hybrid mode (the
-# BiLSTM surrogates) needs TensorFlow, which is only requested here.
-numpy==1.24.3; python_version < "3.13"
-pandas==2.0.3; python_version < "3.13"
-scipy==1.11.1; python_version < "3.13"
-matplotlib==3.7.2; python_version < "3.13"
-tensorflow==2.17.1; python_version < "3.13"
-
-# --- Python >= 3.13: TensorFlow does not currently publish wheels for
-# these Python versions, so it is deliberately left out of this branch
-# rather than failing the entire dependency install (that's what was
-# happening before this change: pip couldn't resolve tensorflow==2.17.1
-# for the host's Python and aborted before installing anything else).
-# app.py probes for TensorFlow at startup (see its TF_AVAILABLE flag) and
-# disables Hybrid mode gracefully when it's missing -- every other tab
-# (Run simulation in Pure physics mode, Coupling ablation, Parameter
-# sweep, Disease scenarios, Drug interventions incl. Multi-drug testing,
-# and Single organ) never needed TensorFlow and is unaffected.
-numpy>=1.26; python_version >= "3.13"
-pandas>=2.1; python_version >= "3.13"
-scipy>=1.12; python_version >= "3.13"
-matplotlib>=3.8; python_version >= "3.13"
+# TensorFlow is intentionally NOT a dependency. Hybrid mode's BiLSTM
+# surrogates run as a pure-NumPy forward pass over the exact trained
+# weights stored in the <organ>_surrogate.pkl files (see app.py's
+# surrogate-inference section) -- verified against the original
+# TensorFlow/Keras model to within float32 rounding before this change.
+# This means the app has no dependency that lacks wheels for whichever
+# Python version a host (e.g. Streamlit Community Cloud) happens to run.
