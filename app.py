@@ -80,6 +80,35 @@ import streamlit as st
 
 
 # =============================================================================
+# TensorFlow availability
+# =============================================================================
+# TensorFlow does not ship wheels for every Python version the day that
+# version is released (as of this deployment, it has none for Python 3.14),
+# and Streamlit Community Cloud has, in practice, not reliably honoured a
+# Python-version pin set in Advanced settings -- so `pip install
+# tensorflow==...` from requirements.txt can fail before app.py ever runs,
+# taking the whole app down with it. To make this deployment resilient to
+# that regardless of which Python the host happens to run, `tensorflow` is
+# NOT listed in requirements.txt at all; it's probed here, once, and every
+# BiLSTM/Hybrid-mode code path below checks this flag before touching it.
+# Everything else in the app -- Pure physics mode (Run simulation, Coupling
+# ablation, Parameter sweep), Disease scenarios, Drug interventions
+# (including Multi-drug testing) and the Single organ tab -- never imports
+# TensorFlow and is completely unaffected either way; those four tabs run
+# pure ODE physics regardless of this flag (see their own tab captions).
+try:
+    import tensorflow as _tf  # noqa: F401  (import-probe only; not used directly)
+    TF_AVAILABLE = True
+    del _tf
+except Exception:
+    # Broad except deliberately: on some hosts a missing/mismatched native
+    # backend surfaces as ImportError, on others as an OSError/RuntimeError
+    # from a half-loaded shared library -- either way, hybrid mode simply
+    # isn't usable here, and that is the only thing this flag needs to know.
+    TF_AVAILABLE = False
+
+
+# =============================================================================
 # bilstm_models/model_builder.py -- build_bilstm only (training/export helpers are training-time-only, not needed here)
 # =============================================================================
 
@@ -5583,22 +5612,37 @@ if st.sidebar.button("Reset all parameters to defaults", use_container_width=Tru
 
 st.sidebar.markdown("---")
 st.sidebar.subheader("Coupled simulation mode")
-sim_mode_label = st.sidebar.radio(
-    "How should the five-organ body be advanced?",
-    ["Hybrid — BiLSTM surrogates", "Pure physics — ODE only"],
-    index=0 if st.session_state.sim_mode == "hybrid" else 1,
-    help=(
-        "Hybrid: kidney, liver, lungs and pancreas are advanced by their "
-        "trained BiLSTM surrogates once a 2-hour warm-up window fills "
-        "(physics runs during warm-up); the heart is always physics, "
-        "different timescale. Pure physics: every organ is solved from its "
-        "ODE every step, as the model has always done. Applies to Run "
-        "simulation, Coupling ablation and Parameter sweep -- Disease "
-        "scenarios and Drug interventions always run pure physics "
-        "regardless of this toggle (see their own tabs for why)."
-    ),
-)
-st.session_state.sim_mode = "hybrid" if sim_mode_label.startswith("Hybrid") else "physics"
+if TF_AVAILABLE:
+    sim_mode_label = st.sidebar.radio(
+        "How should the five-organ body be advanced?",
+        ["Hybrid — BiLSTM surrogates", "Pure physics — ODE only"],
+        index=0 if st.session_state.sim_mode == "hybrid" else 1,
+        help=(
+            "Hybrid: kidney, liver, lungs and pancreas are advanced by their "
+            "trained BiLSTM surrogates once a 2-hour warm-up window fills "
+            "(physics runs during warm-up); the heart is always physics, "
+            "different timescale. Pure physics: every organ is solved from its "
+            "ODE every step, as the model has always done. Applies to Run "
+            "simulation, Coupling ablation and Parameter sweep -- Disease "
+            "scenarios and Drug interventions always run pure physics "
+            "regardless of this toggle (see their own tabs for why)."
+        ),
+    )
+    st.session_state.sim_mode = "hybrid" if sim_mode_label.startswith("Hybrid") else "physics"
+else:
+    # TensorFlow isn't available in this deployment (see the TF_AVAILABLE
+    # probe above) -- fall back to pure physics rather than letting the
+    # user pick a mode that would crash the moment it's used.
+    st.session_state.sim_mode = "physics"
+    st.sidebar.info(
+        "Hybrid mode (BiLSTM surrogates) is unavailable in this deployment "
+        "-- TensorFlow could not be loaded for the Python version this app "
+        "is running on. Running Pure physics mode instead; every organ is "
+        "solved from its own ODE every step, exactly as the model has "
+        "always done. This affects Run simulation, Coupling ablation and "
+        "Parameter sweep only -- Disease scenarios, Drug interventions and "
+        "the Single organ tab never used BiLSTM surrogates to begin with."
+    )
 SIM_MODE = st.session_state.sim_mode
 if SIM_MODE == "hybrid":
     st.sidebar.caption(
